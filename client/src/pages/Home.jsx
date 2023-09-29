@@ -23,7 +23,7 @@ const Home = () => {
             ) : (
                 <>
                     <div className="flex justify-center items-center mt-20">
-                        <div className="text-center font-bold text-3xl hover:shadow-lg transition duration-300 ease-in-out transform hover:scale-105 rounded-full px-5 hover:font-extrabold text-yellow-400">
+                        <div className="text-center font-bold text-3xl px-5 hover:font-extrabold text-yellow-400">
                             My Products
                         </div>
                     </div>
