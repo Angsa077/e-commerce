@@ -1,8 +1,8 @@
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { useGetProductsQuery } from "../features/productsApi";
+import { useGetProductsQuery } from "../store/actions/productsApi";
 import { FaShoppingCart } from "react-icons/fa";
-import { addToCart } from "../features/cartSlice";
+import { addToCart } from "../store/reducers/cartSlice";
 
 const Home = () => {
     const { data, isLoading, isError } = useGetProductsQuery();

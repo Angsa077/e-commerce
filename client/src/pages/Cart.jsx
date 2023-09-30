@@ -1,7 +1,7 @@
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { AiOutlineArrowLeft } from "react-icons/ai"
-import { addToCart, clearCart, decreaseCart, getTotals, removeFromCart } from "../features/cartSlice";
+import { addToCart, clearCart, decreaseCart, getTotals, removeFromCart } from "../store/reducers/cartSlice";
 import { useEffect } from "react";
 
 const Cart = () => {
