@@ -1,5 +1,6 @@
 import express from "express";
 import dotenv from "dotenv";
+import connectDB from "./config/db.js";
 import cors from "cors";
 import { fileURLToPath } from 'url'; // Import fileURLToPath
 import path from "path";
@@ -9,7 +10,7 @@ import authRoute from "./routes/authRoute.js";
 import products from "./data/products.js";
 
 dotenv.config();
-
+connectDB();
 const app = express();
 app.use(express.json());
 app.use(cors());

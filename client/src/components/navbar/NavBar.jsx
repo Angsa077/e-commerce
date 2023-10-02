@@ -20,6 +20,9 @@ import { LiaBlogSolid } from "react-icons/lia";
 
 const NavBar = () => {
     const { cartTotalQuantity } = useSelector((state) => state.cart);
+    const auth = useSelector((state) => state.auth);
+
+    console.log(auth);
     const [isMenuOpen, setIsMenuOpen] = useState(false);
 
     const toggleMenu = () => {
@@ -93,9 +96,16 @@ const NavBar = () => {
                         </span>
                     </Link>
                 </li>
-                <Link to="/login">
-                    <MenuItemFull icon={<HiUser size={18} />} text="Akun" />
-                </Link>
+
+                {
+                    auth._id ? (
+                        <button>Logout</button>
+                    ) : (
+                        <Link to="/login">
+                            <MenuItemFull icon={<HiUser size={18} />} text="Akun" />
+                        </Link>
+                    )
+                }
             </ul>
         </nav>
     );

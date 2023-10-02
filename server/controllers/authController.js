@@ -1,13 +1,11 @@
 import bcrypt from "bcrypt";
-import { PrismaClient } from "@prisma/client";
+import User from "../models/user.js";
 import generateToken from "../utils/authToken.js";
-
-const prisma = new PrismaClient();
 
 const register = async (req, res) => {
     const { name, email, password, confirmPassword } = req.body;
 
-    const existingUser = await prisma.user.findUnique({
+    const existingUser = await User.findOne({
         where: {
             email: email,
         },
@@ -24,12 +22,10 @@ const register = async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 10);
 
     try {
-        const user = await prisma.user.create({
-            data: {
-                name,
-                email,
-                password: hashedPassword,
-            },
+        const user = await User.create({
+            name: name, // use the 'name' variable from req.body
+            email: email, // use the 'email' variable from req.body
+            password: hashedPassword,
         });
         const token = generateToken(user);
         res.status(200).json({ token });
@@ -41,7 +37,7 @@ const register = async (req, res) => {
 const login = async (req, res) => {
     const { email, password } = req.body;
 
-    const user = await prisma.user.findUnique({
+    const user = await User.findOne({
         where: {
             email: email,
         },
