@@ -8,6 +8,7 @@ import path from "path";
 // import routes
 import authRoute from "./routes/authRoute.js";
 import products from "./data/products.js";
+import paymentRoute from "./routes/paymentRoute.js";
 
 dotenv.config();
 connectDB();
@@ -16,6 +17,7 @@ app.use(express.json());
 app.use(cors());
 
 app.use(authRoute);
+app.use("/api/payment", paymentRoute);
 app.get("/api/products", (req, res) => {
     res.send(products);
 });

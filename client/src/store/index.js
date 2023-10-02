@@ -9,14 +9,14 @@ const store = configureStore({
         products: productsReducer,
         cart: cartReducer,
         auth: authReducer,
-        [productsApi.reducerPath]: productsApi.reducer
+        [productsApi.reducerPath]: productsApi.reducer,
     },
     middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware().concat(productsApi.middleware),
+        getDefaultMiddleware().concat(productsApi.middleware),
 });
-
-export default store;
 
 store.dispatch(productsFetch());
 store.dispatch(getTotals());
 store.dispatch(loadUser(null));
+
+export default store;

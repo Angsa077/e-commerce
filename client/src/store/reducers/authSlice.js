@@ -17,13 +17,31 @@ const initialState = {
 
 export const register = createAsyncThunk(
     "auth/register",
-    async (values, { rejectWithValue }) => {
+    async (user, { rejectWithValue }) => {
         try {
             const token = await axios.post(`${url}/register`, {
-                name: values.name,
-                email: values.email,
-                password: values.password,
-                confirmPassword: values.confirmPassword,
+                name: user.name,
+                email: user.email,
+                password: user.password,
+                confirmPassword: user.confirmPassword,
+            });
+
+            localStorage.setItem("token", JSON.stringify(token.data));
+            return token.data;
+        } catch (error) {
+            console.log(error.response.data);
+            return rejectWithValue(error.response.data);
+        }
+    }
+);
+
+export const login = createAsyncThunk(
+    "auth/login",
+    async (user, { rejectWithValue }) => {
+        try {
+            const token = await axios.post(`${url}/login`, {
+                email: user.email,
+                password: user.password,
             });
 
             localStorage.setItem("token", JSON.stringify(token.data));
@@ -40,8 +58,8 @@ const authSlice = createSlice({
     initialState,
     reducers: {
         loadUser(state, action) {
-            if (action.payload) {
-                const token = localStorage.getItem("token");
+            const token = state.token
+            if (token) {
                 const user = jwtDecode(token);
 
                 return {
@@ -54,7 +72,7 @@ const authSlice = createSlice({
                 };
             }
         },
-        logoutUser(state, action) {
+        logout(state, action) {
             localStorage.removeItem("token");
 
             return {
@@ -92,10 +110,33 @@ const authSlice = createSlice({
         });
         builder.addCase(register.rejected, (state, action) => {
             return { ...state, registerStatus: "rejected", registerError: action.payload }
-        })
+        });
+
+
+        builder.addCase(login.pending, (state, action) => {
+            return { ...state, loginStatus: "pending" }
+        });
+        builder.addCase(login.fulfilled, (state, action) => {
+            if (action.payload) {
+                const token = localStorage.getItem("token");
+                const user = jwtDecode(token);
+
+                return {
+                    ...state,
+                    token: token,
+                    name: user.name,
+                    email: user.email,
+                    _id: user._id,
+                    loginStatus: "success",
+                };
+            } else return state;
+        });
+        builder.addCase(login.rejected, (state, action) => {
+            return { ...state, loginStatus: "rejected", loginError: action.payload }
+        });
     },
 });
 
-export const { loadUser, logoutUser } = authSlice.actions;
+export const { loadUser, logout } = authSlice.actions;
 
 export default authSlice.reducer;

@@ -1,12 +1,17 @@
 import { useDispatch, useSelector } from "react-redux";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { AiOutlineArrowLeft } from "react-icons/ai"
 import { addToCart, clearCart, decreaseCart, getTotals, removeFromCart } from "../store/reducers/cartSlice";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import axios from "axios";
 
 const Cart = () => {
     const cart = useSelector((state) => state.cart);
+    const auth = useSelector((state) => state.auth);
     const dispacth = useDispatch();
+    const navigate = useNavigate();
+
+    const [token, setToken] = useState("");
 
     useEffect(() => {
         dispacth(getTotals());
@@ -24,6 +29,72 @@ const Cart = () => {
     const handleClearCart = () => {
         dispacth(clearCart());
     }
+
+    const generateOrderId = () => {
+        const timestamp = new Date().getTime();
+        const randomNumber = Math.floor(Math.random() * 1000);
+        return `ORDER-${timestamp}-${randomNumber}`;
+    };
+
+    const handlePayment = async (e) => {
+        e.preventDefault();
+        try {
+            const data = {
+                order_id: generateOrderId(),
+                name : e.target.name.value,
+                total  : cart.cartTotalAmount
+            }
+            const config = {
+                headers: {
+                    "Content-Type": "application/json",
+                }
+            }
+            const response = await axios.post("http://localhost:5000/api/payment/process-transaction", data, config);
+            setToken(response.data.token);
+        } catch (error) {
+            console.error("Error initiating payment", error);
+        }
+    }
+
+    useEffect(() => {
+        if(token) {
+            window.snap.pay(token, {
+                onSuccess: (result) => {
+                    localStorage.setItem("Pembayaran", JSON.stringify(result));
+                    setToken("");
+                },
+                onPending: (result) => {
+                    localStorage.setItem("Pembayaran", JSON.stringify(result));
+                    setToken("");
+                },
+                onError: (error) => {
+                    console.log(error);
+                    setToken("");
+                },
+                onClose: () => {
+                    console.log("Anda belum menyelesaikan pembayaran");
+                    setToken("");
+                }
+            });
+        }
+    }, [token]);
+
+    useEffect(() => {
+        const midtransUrl = "https://app.sandbox.midtrans.com/snap/snap.js";
+
+        let scriptTag = document.createElement("script");
+        scriptTag.src = midtransUrl;
+
+        const midtransClientKey = "SB-Mid-client-NFdN8OSSRRg6YqZ7";
+        scriptTag.setAttribute("data-client-key", midtransClientKey);
+
+        document.body.appendChild(scriptTag);
+
+        return () => {
+            document.body.removeChild(scriptTag);
+        }
+    }, [])
+
 
     return (
         <div className="container mx-auto py-8 mt-16">
@@ -149,7 +220,33 @@ const Cart = () => {
                                         <span className="">Rp. {(cart.cartTotalAmount).toLocaleString("id-ID", { currency: "IDR" })}</span>
                                     </div>
                                     <p className="text-sm text-gray-500 py-2">Tax and shipping calculated at checkout</p>
-                                    <button className="bg-yellow-400 text-white w-full p-1.5 rounded-xl text-sm transition font-bold duration-300 ease-in-out hover:scale-105">Check out</button>
+
+                                    {auth._id ? (
+                                        <form onSubmit={handlePayment}>
+                                            <div className="mb-3">
+                                                <label htmlFor="name" className="block text-gray-600 text-sm">Name</label>
+                                                <input
+                                                    type="text"
+                                                    id="name"
+                                                    name="name"
+                                                    required
+                                                    value={auth.name}
+                                                    onChange={(e) => { }}
+                                                />
+                                            </div>
+                                            <button type="submit" className="bg-yellow-400 text-white w-full p-1.5 rounded-xl text-sm transition font-bold duration-300 ease-in-out hover:scale-105">
+                                                Proceed to Payment
+                                            </button>
+                                        </form>
+                                    ) : (
+                                        <button
+                                            type="button"
+                                            className="bg-yellow-400 text-white w-full p-1.5 rounded-xl text-sm transition font-bold duration-300 ease-in-out hover:scale-105"
+                                            onClick={() => navigate("/login")}
+                                        >
+                                            Login to Check out</button>
+                                    )}
+
                                     <div className="mt-3 text-sm transition duration-300 ease-in-out hover:scale-105">
                                         <a href="/" className="text-yellow-400 flex"><AiOutlineArrowLeft className="mt-0.5 mr-2" /> <span className="">Continue Shopping</span></a>
                                     </div>

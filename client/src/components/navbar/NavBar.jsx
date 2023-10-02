@@ -1,6 +1,8 @@
 import { Link } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useState } from "react";
+import { logout } from "../../store/reducers/authSlice";
+import { toast } from "react-toastify";
 
 // toggle
 import ToggleProduct from "./toggleProducts";
@@ -21,8 +23,8 @@ import { LiaBlogSolid } from "react-icons/lia";
 const NavBar = () => {
     const { cartTotalQuantity } = useSelector((state) => state.cart);
     const auth = useSelector((state) => state.auth);
+    const dispatch = useDispatch();
 
-    console.log(auth);
     const [isMenuOpen, setIsMenuOpen] = useState(false);
 
     const toggleMenu = () => {
@@ -99,7 +101,14 @@ const NavBar = () => {
 
                 {
                     auth._id ? (
-                        <button>Logout</button>
+                        <button
+                            type="button"
+                            onClick={() => {
+                                dispatch(logout(null));
+                                toast.warning("Logged Out!", { position: "bottom-left" })
+                            }}
+                        >
+                            Logout</button>
                     ) : (
                         <Link to="/login">
                             <MenuItemFull icon={<HiUser size={18} />} text="Akun" />
