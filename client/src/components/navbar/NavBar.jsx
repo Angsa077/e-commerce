@@ -13,7 +13,6 @@ import ToggleMedia from "./toggleMedia";
 // icons
 import { PiShoppingCart } from "react-icons/pi";
 import { BiSearchAlt } from "react-icons/bi";
-import { HiUser } from "react-icons/hi2";
 import { AiTwotoneStar } from "react-icons/ai";
 import { FaCoffee } from "react-icons/fa";
 import { IoHome } from "react-icons/io5";
@@ -22,13 +21,18 @@ import { LiaBlogSolid } from "react-icons/lia";
 
 const NavBar = () => {
     const { cartTotalQuantity } = useSelector((state) => state.cart);
+    const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const [isProfileOpen, setIsProfileOpen] = useState(false);
+
     const auth = useSelector((state) => state.auth);
     const dispatch = useDispatch();
 
-    const [isMenuOpen, setIsMenuOpen] = useState(false);
-
     const toggleMenu = () => {
         setIsMenuOpen(!isMenuOpen);
+    };
+
+    const toggleProfile = () => {
+        setIsProfileOpen(!isProfileOpen);
     };
 
     function MenuItemMobile({ icon, text }) {
@@ -59,7 +63,7 @@ const NavBar = () => {
             {/* Tampilan Mobile */}
             <button onClick={toggleMenu} className="sm:hidden flex items-center mr-10 text-2xl">
                 {isMenuOpen ? (
-                    <span className="text-red-500">&#10005;</span>
+                    <span>&#10005;</span>
                 ) : (
                     <span>&#9776;</span>
                 )}
@@ -71,7 +75,7 @@ const NavBar = () => {
                         <MenuItemMobile icon={<IoHome size={18} />} text="Home" />
                     </Link>
                     <Link to="/login" >
-                        <MenuItemMobile icon={<HiUser size={18} />} text="Akun" />
+                        <MenuItemMobile text="Login" />
                     </Link>
                     <MenuItemMobile icon={<IoMdPricetags size={18} />} text={<ToggleProduct />} />
                     <MenuItemMobile icon={<FaCoffee size={18} />} text={<ToggleJasa />} />
@@ -111,7 +115,7 @@ const NavBar = () => {
                             Logout</button>
                     ) : (
                         <Link to="/login">
-                            <MenuItemFull icon={<HiUser size={18} />} text="Akun" />
+                            <MenuItemFull text="Login" />
                         </Link>
                     )
                 }
